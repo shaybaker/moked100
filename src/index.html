@@ -17,11 +17,13 @@
         <div class="badge-title">משטרת ישראל</div>
         <div class="badge-sub">מוקד 100 · מערכת שליטה ובקרה</div>
       </div>
-      <p class="login-instruction">בחר תעודת שוטר כדי להתחיל משמרת</p>
+      <p class="login-instruction">בחרו תעודת שוטר ומצב משחק כדי להתחיל משמרת</p>
       <div id="avatar-list" class="avatar-list"></div>
+      <div class="login-section-title">מצב משחק</div>
+      <div id="mode-list" class="mode-list"></div>
       <div id="login-stats" class="login-stats"></div>
-      <button id="btn-start" class="btn btn-primary btn-big" disabled>התחל משמרת</button>
-      <div class="login-footer" dir="ltr">MOKED-100 · v1.0 · TERMINAL 04</div>
+      <button id="btn-start" class="btn btn-primary btn-big" disabled>להתחיל משמרת</button>
+      <div class="login-footer" dir="ltr">MOKED-100 · v1.1 · TERMINAL 04</div>
     </div>
   </section>
 
@@ -69,6 +71,7 @@
       <aside class="panel panel-incident">
         <div class="panel-title">
           <span>טיפול באירוע</span>
+          <span id="timer" class="timer" dir="ltr" hidden>01:30</span>
           <span id="incident-id" class="incident-id" dir="ltr"></span>
         </div>
 
@@ -79,12 +82,21 @@
           </div>
         </div>
 
+        <div id="step-queue" class="step" hidden>
+          <div class="instruction">
+            <div class="instruction-icon">📞</div>
+            <div>כמה קריאות בבת אחת! איזו דחופה יותר?</div>
+          </div>
+          <div id="queue-list" class="queue-list"></div>
+          <div id="queue-feedback" class="feedback"></div>
+        </div>
+
         <div id="step-ring" class="step" hidden>
           <div class="ring-box">
             <div class="ring-phone">📞</div>
             <div class="ring-title">קריאה נכנסת</div>
             <div class="ring-sub">מוקד 100 · קו 3</div>
-            <button id="btn-answer" class="btn btn-danger btn-big">ענה לשיחה</button>
+            <button id="btn-answer" class="btn btn-danger btn-big">לענות לשיחה</button>
           </div>
         </div>
 
@@ -93,7 +105,7 @@
             <div id="caller-icon" class="caller-icon"></div>
             <div>
               <div id="caller-name" class="caller-name"></div>
-              <div class="caller-line">קו פתוח · מוקלט</div>
+              <div class="caller-line">קו 3 · השיחה מוקלטת</div>
             </div>
           </div>
           <div id="caller-text" class="caller-text"></div>
@@ -101,7 +113,7 @@
             <span>דחיפות:</span>
             <span id="priority-badge" class="priority-badge"></span>
           </div>
-          <button id="btn-watch" class="btn btn-primary btn-big">פתח מצלמת אבטחה</button>
+          <button id="btn-watch" class="btn btn-primary btn-big">לפתוח מצלמת אבטחה</button>
         </div>
 
         <div id="step-video" class="step" hidden>
@@ -110,13 +122,13 @@
             <video id="cctv" playsinline preload="auto"></video>
           </div>
           <div id="video-title" class="video-title"></div>
-          <button id="btn-after-video" class="btn btn-primary btn-big">סמן מיקום במפה</button>
+          <button id="btn-after-video" class="btn btn-primary btn-big">לסמן מיקום במפה</button>
         </div>
 
         <div id="step-place" class="step" hidden>
           <div class="instruction">
             <div class="instruction-icon">📍</div>
-            <div>לחץ על מקום האירוע במפה</div>
+            <div>לחצו על מקום האירוע במפה</div>
           </div>
           <div id="place-feedback" class="feedback"></div>
         </div>
@@ -124,7 +136,7 @@
         <div id="step-unit" class="step" hidden>
           <div class="instruction">
             <div class="instruction-icon">🚨</div>
-            <div>איזה כוח לשלוח לאירוע?</div>
+            <div>איזה כוח שולחים לאירוע?</div>
           </div>
           <div id="unit-list" class="unit-list"></div>
           <div id="unit-feedback" class="feedback"></div>
@@ -150,8 +162,9 @@
         <div id="step-done" class="step" hidden>
           <div class="done-box">
             <div class="done-icon">✅</div>
+            <div class="done-radio">📻 דיווח מהשטח</div>
             <div id="done-text" class="done-text"></div>
-            <button id="btn-commander" class="btn btn-primary btn-big">שלח דוח למפקד</button>
+            <button id="btn-commander" class="btn btn-primary btn-big">לשלוח את הדוח למפקד</button>
           </div>
         </div>
       </aside>
@@ -161,8 +174,9 @@
       <span>אירועים שטופלו: <b id="stat-calls">0</b></span>
       <span>כוכבים: <b id="stat-stars">0</b></span>
       <span>דרגה: <b id="stat-rank"></b></span>
+      <span>מצב: <b id="stat-mode"></b></span>
       <span class="statusbar-end">
-        <button id="btn-mute" class="btn btn-ghost btn-small" title="השתק">🔊</button>
+        <button id="btn-mute" class="btn btn-ghost btn-small" title="השתקה">🔊</button>
         <button id="btn-logout" class="btn btn-ghost btn-small">סיום משמרת</button>
       </span>
     </footer>

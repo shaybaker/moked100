@@ -232,9 +232,18 @@ button { font-family: inherit; }
 .feedback.ok { color: #86efac; }
 .unit-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .unit-card {
+  position: relative;
   background: var(--panel-2); border: 2px solid var(--line); border-radius: 12px;
   padding: 12px 10px; text-align: center; cursor: pointer; transition: border-color .15s, transform .1s;
 }
+.unit-card .speak {
+  position: absolute; top: 6px; inset-inline-start: 6px;
+  background: none; border: 1px solid var(--line); border-radius: 8px; color: var(--muted);
+  font-size: 13px; padding: 2px 6px; cursor: pointer;
+}
+.unit-card .speak:hover { color: var(--text); }
+.unit-card.hint { border-color: var(--warn); animation: pulse-border 1s infinite; }
+@keyframes pulse-border { 50% { box-shadow: 0 0 0 4px #f59e0b55; } }
 .unit-card:hover { border-color: var(--accent-2); transform: translateY(-2px); }
 .unit-card .icon { font-size: 44px; line-height: 1.1; }
 .unit-card .name { font-weight: 700; margin-top: 4px; }
@@ -264,7 +273,8 @@ button { font-family: inherit; }
 .option.right { border-color: var(--ok); background: #14361f; }
 .done-box { text-align: center; padding: 10px 0; }
 .done-icon { font-size: 60px; }
-.done-text { font-size: 18px; line-height: 1.6; margin: 10px 0 18px; }
+.done-radio { color: var(--muted); font-size: 13px; letter-spacing: .04em; margin-top: 6px; }
+.done-text { font-size: 18px; line-height: 1.6; margin: 6px 0 18px; font-family: var(--font); }
 
 /* status bar */
 .statusbar {
@@ -305,6 +315,54 @@ button { font-family: inherit; }
 }
 .subtitle span { background: #000000cc; color: #fff; padding: 8px 18px; border-radius: 8px; font-size: 18px; font-weight: 700; max-width: 80vw; }
 
+/* ---------- game modes (login) ---------- */
+.login-section-title { color: var(--muted); font-size: 14px; margin: 2px 0 8px; }
+.mode-list { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
+.mode-card {
+  background: var(--panel-2); border: 2px solid var(--line); border-radius: 12px;
+  padding: 10px 6px 8px; cursor: pointer; transition: border-color .15s, transform .1s;
+}
+.mode-card:hover { transform: translateY(-2px); }
+.mode-card.selected { border-color: var(--gold); box-shadow: 0 0 0 3px #fbbf2440; }
+.mode-card .icon { font-size: 30px; line-height: 1.1; }
+.mode-card .name { font-weight: 700; font-size: 14px; margin-top: 4px; }
+.mode-card .desc { font-size: 11px; color: var(--muted); line-height: 1.3; margin-top: 2px; }
+
+/* ---------- simultaneous calls (multi mode) ---------- */
+.queue-list { display: grid; gap: 10px; }
+.queue-card {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--panel-2); border: 2px solid var(--line); border-radius: 12px;
+  padding: 10px 12px; cursor: pointer; transition: border-color .15s;
+}
+.queue-card:hover { border-color: var(--accent-2); }
+.queue-icon { font-size: 34px; }
+.queue-body { flex: 1; }
+.queue-name { font-weight: 700; }
+.queue-code { color: var(--muted); font-size: 13px; }
+.queue-card.wrong { border-color: var(--danger); animation: nudge .3s; }
+.queue-card.chosen { border-color: var(--ok); background: #14361f; }
+
+/* ---------- countdown (rush mode) ---------- */
+.timer { font-family: var(--mono); font-weight: 700; font-size: 15px; color: var(--ok); margin-inline-start: auto; margin-inline-end: 10px; }
+.timer.low { color: var(--danger); animation: blink .6s infinite; }
+
+/* ---------- night shift theme ---------- */
+body[data-mode="night"] {
+  --bg: #05070d; --bg-2: #090d17; --panel: #0c101c; --panel-2: #111829; --line: #1d2640;
+  --accent: #d97706; --accent-2: #f59e0b;
+}
+body[data-mode="night"] .topbar { background: linear-gradient(180deg, #1c1230, #090d17); }
+body[data-mode="night"] .shift-status { color: var(--gold); }
+body[data-mode="night"] .map-wrap { background: #04060b; }
+body[data-mode="night"] .map-block { fill: #0d1526; stroke: #16203a; }
+body[data-mode="night"] .place-ring { fill: #0a1120; }
+body[data-mode="night"] .btn-primary { color: #1a1206; }
+
+/* ---------- training theme ---------- */
+body[data-mode="training"] .shift-status { color: var(--accent-2); }
+
 @media (max-width: 1100px) {
   .console { grid-template-columns: 200px 1fr 340px; }
+  .mode-list { grid-template-columns: repeat(3, 1fr); }
 }
