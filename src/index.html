@@ -17,13 +17,25 @@
         <div class="badge-title">משטרת ישראל</div>
         <div class="badge-sub">מוקד 100 · מערכת שליטה ובקרה</div>
       </div>
-      <p class="login-instruction">בחרו תעודת שוטר ומצב משחק כדי להתחיל משמרת</p>
+      <p class="login-instruction">כתבו את השם, בחרו תעודת שוטר ומצב משחק, ומתחילים משמרת</p>
+      <div class="login-field">
+        <label for="officer-name">שם השוטר</label>
+        <input id="officer-name" class="name-input" type="text" maxlength="20" placeholder="איך קוראים לך?" autocomplete="off" spellcheck="false">
+      </div>
       <div id="avatar-list" class="avatar-list"></div>
       <div class="login-section-title">מצב משחק</div>
       <div id="mode-list" class="mode-list"></div>
       <div id="login-stats" class="login-stats"></div>
       <button id="btn-start" class="btn btn-primary btn-big" disabled>להתחיל משמרת</button>
-      <div class="login-footer" dir="ltr">MOKED-100 · v1.1 · TERMINAL 04</div>
+      <div class="login-actions">
+        <button id="btn-reset" class="btn btn-ghost btn-small">איפוס המשחק והתחלה מאפס</button>
+        <div id="reset-confirm" class="reset-confirm" hidden>
+          <span>למחוק את כל הנקודות, הכוכבים והדרגה?</span>
+          <button id="btn-reset-yes" class="btn btn-danger btn-small">כן, להתחיל מאפס</button>
+          <button id="btn-reset-no" class="btn btn-ghost btn-small">ביטול</button>
+        </div>
+      </div>
+      <div class="login-footer" dir="ltr">MOKED-100 · v1.2 · TERMINAL 04</div>
     </div>
   </section>
 

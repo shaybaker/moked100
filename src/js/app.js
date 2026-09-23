@@ -13,7 +13,7 @@ const RUSH_SECONDS = 90;
 
 // ---------------------------------------------------------------- persistence
 const tauri = window.__TAURI__?.core;
-const DEFAULT_PROFILE = { avatar: null, mode: "regular", points: 0, stars: 0, calls: 0, history: [] };
+const DEFAULT_PROFILE = { name: "", avatar: null, mode: "regular", points: 0, stars: 0, calls: 0, history: [] };
 let profile = { ...DEFAULT_PROFILE };
 
 async function loadProfile() {
@@ -31,6 +31,7 @@ async function saveProfile() {
 }
 
 const avatar = () => AVATARS.find((a) => a.id === profile.avatar) || AVATARS[0];
+const officerName = () => (profile.name || "").trim();
 const gender = () => avatar().gender;
 const mode = () => MODES.find((m) => m.id === profile.mode) || MODES[0];
 const inMode = (id) => mode().id === id;
@@ -209,7 +210,7 @@ function showStep(id) {
 function refreshHeader() {
   const rank = rankName(rankFor(profile.points));
   $("officer-avatar").textContent = avatar().icon;
-  $("officer-rank").textContent = rank;
+  $("officer-rank").textContent = `${rank} ${officerName()}`;
   $("officer-points").textContent = profile.points;
   $("officer-stars").textContent = profile.stars;
   $("stat-calls").textContent = profile.calls;
@@ -281,9 +282,10 @@ async function startShift() {
   document.body.dataset.mode = mode().id;
   $("shift-status").textContent = mode().name;
   game.queue = [];
+  await saveProfile();
   refreshHeader();
   renderUnitStatus();
-  log(`המשמרת התחילה. עמדה 04 פעילה. מצב: ${mode().name}`, "hi");
+  log(`המשמרת של ${officerName()} התחילה. עמדה 04 פעילה. מצב: ${mode().name}`, "hi");
   await say("cmd_intro");
   if (LINES["intro_" + mode().id]) { await wait(300); await say("intro_" + mode().id); }
   await wait(600);
@@ -647,10 +649,10 @@ async function commanderReview() {
   $("score-total").textContent = `${total} / ${max}`;
   const starsEl = $("commander-stars");
   starsEl.innerHTML = "";
-  $("commander-text").textContent = LINES[lineId("cmd_" + stars)] || "";
+  $("commander-text").textContent = `${officerName()}, ${LINES[lineId("cmd_" + stars)] || ""}`;
   const ru = $("rankup");
   ru.hidden = after <= before;
-  if (after > before) ru.textContent = `קידום בדרגה: ${rankName(RANKS[after])}`;
+  if (after > before) ru.textContent = `קידום בדרגה: ${rankName(RANKS[after])} ${officerName()}`;
   $("modal-commander").hidden = false;
   sfx("fanfare");
   for (let i = 0; i < 3; i++) {
@@ -662,10 +664,10 @@ async function commanderReview() {
     if (i < stars) sfx("star");
   }
   refreshHeader();
-  log(`המפקד אישר את הדוח: ${stars} כוכבים, ${total} נקודות`, "hi");
+  log(`המפקד אישר את הדוח של ${officerName()}: ${stars} כוכבים, ${total} נקודות`, "hi");
   await say("cmd_" + stars);
   if (after > before) {
-    log(`קידום בדרגה: ${rankName(RANKS[after])}`, "hi");
+    log(`קידום בדרגה: ${rankName(RANKS[after])} ${officerName()}`, "hi");
     await say("cmd_rankup");
     await say("rank_" + after);
   }
@@ -683,7 +685,7 @@ function buildLogin() {
       profile.avatar = a.id;
       for (const c of list.children) c.classList.remove("selected");
       card.classList.add("selected");
-      $("btn-start").disabled = false;
+      refreshStartButton();
       renderLoginStats();
       sfx("click");
     });
@@ -703,14 +705,32 @@ function buildLogin() {
     });
     modes.append(card);
   }
-  $("btn-start").disabled = !profile.avatar;
+  $("officer-name").value = profile.name || "";
+  $("reset-confirm").hidden = true;
+  $("btn-reset").hidden = false;
+  refreshStartButton();
   renderLoginStats();
 }
 
+/** The shift can start once the officer has a name and a badge. */
+function refreshStartButton() {
+  $("btn-start").disabled = !(profile.avatar && officerName());
+}
+
 function renderLoginStats() {
+  const name = officerName();
+  const who = name ? `${name} · ` : "";
   $("login-stats").textContent = profile.calls
-    ? `דרגה: ${rankName(rankFor(profile.points))} · ${profile.points} נקודות · ${profile.stars} כוכבים · ${profile.calls} אירועים`
-    : "עוד אין אירועים בתיק. המשמרת הראשונה מחכה.";
+    ? `${who}דרגה: ${rankName(rankFor(profile.points))} · ${profile.points} נקודות · ${profile.stars} כוכבים · ${profile.calls} אירועים`
+    : name ? `${name}, עוד אין אירועים בתיק. המשמרת הראשונה מחכה.` : "עוד אין אירועים בתיק. המשמרת הראשונה מחכה.";
+}
+
+/** Wipes the saved progress (name, badge, points, rank) after an inline confirmation. */
+async function resetGame() {
+  profile = { ...DEFAULT_PROFILE, history: [] };
+  await saveProfile();
+  buildLogin();
+  $("officer-name").focus();
 }
 
 // ---------------------------------------------------------------- init
@@ -723,6 +743,11 @@ async function init() {
   $("clock").textContent = timeNow();
 
   $("btn-start").addEventListener("click", () => { sfx("click"); startShift(); });
+  $("officer-name").addEventListener("input", (e) => { profile.name = e.target.value.slice(0, 20); refreshStartButton(); renderLoginStats(); });
+  $("officer-name").addEventListener("keydown", (e) => { if (e.key === "Enter" && !$("btn-start").disabled) { sfx("click"); startShift(); } });
+  $("btn-reset").addEventListener("click", () => { sfx("click"); $("btn-reset").hidden = true; $("reset-confirm").hidden = false; });
+  $("btn-reset-no").addEventListener("click", () => { sfx("click"); $("reset-confirm").hidden = true; $("btn-reset").hidden = false; });
+  $("btn-reset-yes").addEventListener("click", () => { sfx("click"); resetGame(); });
   $("btn-answer").addEventListener("click", answerCall);
   $("btn-watch").addEventListener("click", () => { sfx("click"); watchCamera(); });
   $("btn-after-video").addEventListener("click", () => { sfx("click"); askPlace(); });

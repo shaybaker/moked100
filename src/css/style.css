@@ -80,6 +80,7 @@ button { font-family: inherit; }
 }
 .login-box {
   width: min(680px, 92vw);
+  max-height: 96vh; overflow-y: auto;
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 16px;
@@ -92,6 +93,17 @@ button { font-family: inherit; }
 .badge-title { font-size: 30px; font-weight: 900; letter-spacing: .02em; }
 .badge-sub { color: var(--muted); font-size: 15px; }
 .login-instruction { color: var(--muted); margin: 8px 0 14px; }
+.login-field { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px; }
+.login-field label { font-weight: 700; color: var(--muted); }
+.name-input {
+  width: min(320px, 60vw); font-family: inherit; font-size: 22px; font-weight: 700; text-align: center;
+  color: var(--text); background: var(--bg-2); border: 2px solid var(--line); border-radius: 12px; padding: 10px 14px;
+  outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.name-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px #3b82f640; }
+.name-input::placeholder { color: #4b5d7d; font-weight: 400; }
+.login-actions { margin-top: 12px; min-height: 30px; }
+.reset-confirm { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; color: #fca5a5; font-size: 14px; }
 .avatar-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
 .avatar-card {
   background: var(--panel-2);
