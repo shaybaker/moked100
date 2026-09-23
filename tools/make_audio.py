@@ -199,21 +199,28 @@ for _sid, _texts in OPTIONS.items():
 
 # Officer names recorded in advance, so the dispatcher and the commander can
 # address the child by name ("איתי, קריאה נכנסת"). Key = file id, value = the
-# name exactly as a child would type it on the login screen. Written to
-# src/data/names.json for the UI.
+# name as a child types it on the login screen plus a fully vowelled form for
+# the voice (without nikud "איתי" comes out as "iti"). Typed forms are written
+# to src/data/names.json for the UI.
 NAMES = {
-    "itay": "איתי", "david": "דוד", "uri": "אורי", "yosef": "יוסף", "ariel": "אריאל", "daniel": "דניאל",
-    "noam": "נועם", "eitan": "איתן", "yonatan": "יונתן", "yehonatan": "יהונתן", "lavi": "לביא", "ido": "עידו",
-    "adam": "אדם", "omer": "עומר", "yair": "יאיר", "michael": "מיכאל", "itamar": "איתמר", "alon": "אלון",
-    "nadav": "נדב", "guy": "גיא", "roee": "רועי", "tal": "טל", "ilay": "עילאי", "liam": "ליאם", "yuval": "יובל",
-    "noa": "נועה", "tamar": "תמר", "maya": "מאיה", "avigail": "אביגיל", "shira": "שירה", "yael": "יעל",
-    "adel": "אדל", "ayala": "איילה", "talia": "טליה", "lia": "ליה", "romi": "רומי", "ella": "אלה",
-    "hila": "הילה", "michal": "מיכל", "agam": "אגם", "sara": "שרה", "naama": "נעמה", "gali": "גלי",
-    "emma": "אמה", "libi": "ליבי", "shai": "שי", "dana": "דנה", "amit": "עמית", "ron": "רון", "eden": "עדן",
+    # key: (as typed on the login screen, with nikud so the voice pronounces it right)
+    "itay": ("איתי", "אִיתַי"), "david": ("דוד", "דָּוִד"), "uri": ("אורי", "אוּרִי"), "yosef": ("יוסף", "יוֹסֵף"),
+    "ariel": ("אריאל", "אֲרִיאֵל"), "daniel": ("דניאל", "דָּנִיאֵל"), "noam": ("נועם", "נֹעַם"), "eitan": ("איתן", "אֵיתָן"),
+    "yonatan": ("יונתן", "יוֹנָתָן"), "yehonatan": ("יהונתן", "יְהוֹנָתָן"), "lavi": ("לביא", "לָבִיא"), "ido": ("עידו", "עִידוֹ"),
+    "adam": ("אדם", "אָדָם"), "omer": ("עומר", "עוֹמֶר"), "yair": ("יאיר", "יָאִיר"), "michael": ("מיכאל", "מִיכָאֵל"),
+    "itamar": ("איתמר", "אִיתָמָר"), "alon": ("אלון", "אַלּוֹן"), "nadav": ("נדב", "נָדָב"), "guy": ("גיא", "גַּיְא"),
+    "roee": ("רועי", "רוֹעִי"), "tal": ("טל", "טַל"), "ilay": ("עילאי", "עִילַאי"), "liam": ("ליאם", "לִיאָם"),
+    "yuval": ("יובל", "יוּבַל"), "noa": ("נועה", "נֹעָה"), "tamar": ("תמר", "תָּמָר"), "maya": ("מאיה", "מָאיָה"),
+    "avigail": ("אביגיל", "אֲבִיגַיִל"), "shira": ("שירה", "שִׁירָה"), "yael": ("יעל", "יָעֵל"), "adel": ("אדל", "אָדֵל"),
+    "ayala": ("איילה", "אַיָּלָה"), "talia": ("טליה", "טַלְיָה"), "lia": ("ליה", "לִיָּה"), "romi": ("רומי", "רוֹמִי"),
+    "ella": ("אלה", "אֵלָה"), "hila": ("הילה", "הִילָה"), "michal": ("מיכל", "מִיכַל"), "agam": ("אגם", "אֲגַם"),
+    "sara": ("שרה", "שָׂרָה"), "naama": ("נעמה", "נַעֲמָה"), "gali": ("גלי", "גַּלִּי"), "emma": ("אמה", "אֶמָה"),
+    "libi": ("ליבי", "לִיבִּי"), "shai": ("שי", "שַׁי"), "dana": ("דנה", "דָּנָה"), "amit": ("עמית", "עָמִית"),
+    "ron": ("רון", "רוֹן"), "eden": ("עדן", "עֵדֶן"),
 }
-for _k, _n in NAMES.items():
-    LINES[f"name_{_k}"] = (DISPATCHER, f"{_n},")
-    LINES[f"name_{_k}_cmd"] = (COMMANDER, f"{_n},")
+for _k, (_typed, _spoken) in NAMES.items():
+    LINES[f"name_{_k}"] = (DISPATCHER, f"{_spoken},")
+    LINES[f"name_{_k}_cmd"] = (COMMANDER, f"{_spoken},")
 
 
 def flat_lines():
@@ -349,7 +356,7 @@ async def make_tts(force=False):
     with open(LINES_JSON, "w", encoding="utf-8") as f:
         json.dump({k: v[3] for k, v in lines.items()}, f, ensure_ascii=False, indent=1)
     with open(os.path.join(DATA, "names.json"), "w", encoding="utf-8") as f:
-        json.dump({name: key for key, name in NAMES.items()}, f, ensure_ascii=False, indent=1)
+        json.dump({typed: key for key, (typed, _spoken) in NAMES.items()}, f, ensure_ascii=False, indent=1)
     known = set(lines) | {"sfx_ring", "sfx_siren", "sfx_click", "sfx_correct", "sfx_wrong", "sfx_star", "sfx_fanfare",
                           "sfx_radio", "sfx_tick"}
     stale = sorted(f[:-4] for f in os.listdir(AUDIO) if f.endswith(".mp3") and f[:-4] not in known)
