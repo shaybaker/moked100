@@ -46,6 +46,7 @@ const rankName = (r) => (gender() === "f" && r.f ? r.f : r.name);
 
 // ---------------------------------------------------------------- audio
 let LINES = {};
+let NAMES = {};
 let muted = false;
 const voice = new Audio();
 const fx = new Audio();
@@ -73,22 +74,21 @@ function showSubtitle(text) {
 /** Uses the feminine recording of a line when the chosen officer is a woman. */
 function lineId(id) { return gender() === "f" && LINES[id + "_f"] ? id + "_f" : id; }
 
-/** Speaks one narration line; resolves when it ends (or right away when muted).
+/** Plays one audio file with a subtitle; resolves when it ends (or right away when muted).
  *  A guard timer resolves anyway if the file stalls, so a bad audio file can never freeze the game. */
-function say(id) {
-  id = lineId(id);
+function speak(src, text, keepSubtitle = false) {
   const token = ++voiceToken;
-  showSubtitle(LINES[id] || "");
+  showSubtitle(text);
   return new Promise((resolve) => {
-    if (muted) { setTimeout(() => { if (token === voiceToken) showSubtitle(""); resolve(); }, 900); return; }
+    if (muted) { setTimeout(() => { if (token === voiceToken && !keepSubtitle) showSubtitle(""); resolve(); }, 900); return; }
     let guard = setTimeout(() => done(), 20000);
     const done = () => {
       clearTimeout(guard);
       if (token !== voiceToken) return;   // a newer line took over: this one is void
-      showSubtitle("");
+      if (!keepSubtitle) showSubtitle("");
       resolve();
     };
-    voice.src = `assets/audio/${id}.mp3`;
+    voice.src = src;
     voice.onended = done;
     voice.onerror = done;
     voice.onloadedmetadata = () => {
@@ -98,6 +98,29 @@ function say(id) {
     };
     voice.play().catch(done);
   });
+}
+
+/** Speaks one narration line by id. */
+function say(id) {
+  id = lineId(id);
+  return speak(`assets/audio/${id}.mp3`, LINES[id] || "");
+}
+
+/** File id of the pre-recorded clip for the officer's name, if there is one (data/names.json). */
+function nameClip() {
+  const typed = officerName().replace(/[\u0591-\u05C7'"׳״]/g, "").replace(/\s+/g, " ").trim();
+  return NAMES[typed] || null;
+}
+
+/** Says the officer's name and then the line ("איתי, קריאה נכנסת"); voice "cmd" uses the commander's recording.
+ *  Falls back to the plain line when the name has no recording. */
+async function sayNamed(id, voice = "") {
+  const key = nameClip();
+  if (!key) return say(id);
+  id = lineId(id);
+  const text = `${officerName()}, ${LINES[id] || ""}`;
+  await speak(`assets/audio/name_${key}${voice === "cmd" ? "_cmd" : ""}.mp3`, text, true);
+  return speak(`assets/audio/${id}.mp3`, text);
 }
 function stopVoice() { voiceToken++; voice.pause(); showSubtitle(""); }
 const speaking = () => !voice.paused && !voice.ended;
@@ -286,7 +309,7 @@ async function startShift() {
   refreshHeader();
   renderUnitStatus();
   log(`המשמרת של ${officerName()} התחילה. עמדה 04 פעילה. מצב: ${mode().name}`, "hi");
-  await say("cmd_intro");
+  await sayNamed("cmd_intro", "cmd");
   if (LINES["intro_" + mode().id]) { await wait(300); await say("intro_" + mode().id); }
   await wait(600);
   nextCall();
@@ -321,7 +344,7 @@ function ringPhone() {
   sfx("ring", true);
   game.ringStart = performance.now();
   log("קריאה נכנסת בקו 3", "hi");
-  say("ring");
+  sayNamed("ring");
 }
 
 function showQueue() {
@@ -341,7 +364,7 @@ function showQueue() {
   sfx("ring", true);
   game.ringStart = performance.now();
   log(`${game.queue.length} קריאות נכנסו בבת אחת`, "hi");
-  say("queue_intro");
+  sayNamed("queue_intro");
 }
 
 async function onQueueClick(scene, card) {
@@ -665,10 +688,10 @@ async function commanderReview() {
   }
   refreshHeader();
   log(`המפקד אישר את הדוח של ${officerName()}: ${stars} כוכבים, ${total} נקודות`, "hi");
-  await say("cmd_" + stars);
+  await sayNamed("cmd_" + stars, "cmd");
   if (after > before) {
     log(`קידום בדרגה: ${rankName(RANKS[after])} ${officerName()}`, "hi");
-    await say("cmd_rankup");
+    await sayNamed("cmd_rankup", "cmd");
     await say("rank_" + after);
   }
 }
@@ -736,6 +759,7 @@ async function resetGame() {
 // ---------------------------------------------------------------- init
 async function init() {
   try { LINES = await (await fetch("data/lines.json")).json(); } catch (e) { console.warn("lines", e); }
+  try { NAMES = await (await fetch("data/names.json")).json(); } catch (e) { console.warn("names", e); }
   await loadProfile();
   buildLogin();
   buildMap();

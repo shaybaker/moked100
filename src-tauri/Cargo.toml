@@ -1,6 +1,6 @@
 [package]
 name = "moked100"
-version = "1.2.0"
+version = "1.3.0"
 description = "מוקד 100 - משחק שוטרים לילדים"
 authors = ["Shay Baker"]
 edition = "2021"
