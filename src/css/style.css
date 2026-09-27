@@ -69,6 +69,25 @@ button { font-family: inherit; }
 .btn-big { font-size: 20px; padding: 16px 24px; width: 100%; }
 .btn-small { font-size: 13px; padding: 5px 10px; }
 
+/* ---------- dedication splash ---------- */
+#screen-splash {
+  align-items: center; justify-content: center; cursor: pointer; z-index: 5;
+  background:
+    radial-gradient(700px 420px at 50% 45%, #5b1d3a66 0%, transparent 65%),
+    radial-gradient(900px 500px at 50% -10%, #1d3a6b 0%, transparent 60%),
+    var(--bg);
+}
+.splash-box { text-align: center; padding: 24px; animation: pop .5s; }
+.splash-title { font-size: 44px; font-weight: 900; letter-spacing: .03em; }
+.splash-heart { font-size: 96px; line-height: 1.2; margin: 10px 0 6px; animation: heartbeat 1.3s ease-in-out infinite; filter: drop-shadow(0 0 28px #ef444488); }
+@keyframes heartbeat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.16); } 30% { transform: scale(1); } 45% { transform: scale(1.1); } 60% { transform: scale(1); } }
+.splash-dedication { font-size: 40px; font-weight: 900; color: var(--gold); text-shadow: 0 0 30px #fbbf2444; }
+.splash-from { font-size: 28px; font-weight: 700; margin-top: 4px; }
+.splash-hint { margin-top: 28px; color: var(--muted); font-size: 16px; animation: blink 2s infinite; min-height: 24px; }
+#screen-splash.playing .splash-hint { visibility: hidden; }
+.dedication { margin-top: 8px; color: var(--gold); font-weight: 700; font-size: 15px; }
+.made-with-love { color: var(--gold); font-weight: 700; }
+
 /* ---------- login ---------- */
 #screen-login {
   align-items: center; justify-content: center;

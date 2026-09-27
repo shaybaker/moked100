@@ -3,19 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>מוקד 100 - מערכת שליטה ובקרה</title>
+  <title>מוקד 100 - נבנה באהבה לאיתי</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
+  <!-- ===== dedication splash ===== -->
+  <section id="screen-splash" class="screen">
+    <div class="splash-box">
+      <div class="badge-star">★</div>
+      <div class="splash-title">מוקד 100</div>
+      <div class="splash-heart">❤️</div>
+      <div class="splash-dedication">נבנה באהבה גדולה לאיתי</div>
+      <div class="splash-from">משי בייקר</div>
+      <div id="splash-hint" class="splash-hint">לחצו כדי להיכנס למוקד</div>
+    </div>
+  </section>
+
   <!-- ===== login / shift start ===== -->
-  <section id="screen-login" class="screen">
+  <section id="screen-login" class="screen" hidden>
     <div class="login-box">
       <div class="login-badge">
         <div class="badge-star">★</div>
         <div class="badge-title">משטרת ישראל</div>
         <div class="badge-sub">מוקד 100 · מערכת שליטה ובקרה</div>
+        <div class="dedication">❤️ נבנה באהבה גדולה לאיתי, משי בייקר</div>
       </div>
       <p class="login-instruction">כתבו את השם, בחרו תעודת שוטר ומצב משחק, ומתחילים משמרת</p>
       <div class="login-field">
@@ -35,7 +48,7 @@
           <button id="btn-reset-no" class="btn btn-ghost btn-small">ביטול</button>
         </div>
       </div>
-      <div class="login-footer" dir="ltr">MOKED-100 · v1.3 · TERMINAL 04</div>
+      <div class="login-footer" dir="ltr">MOKED-100 · v1.4 · TERMINAL 04</div>
     </div>
   </section>
 
@@ -187,6 +200,7 @@
       <span>כוכבים: <b id="stat-stars">0</b></span>
       <span>דרגה: <b id="stat-rank"></b></span>
       <span>מצב: <b id="stat-mode"></b></span>
+      <span class="made-with-love">נבנה באהבה גדולה לאיתי ❤️ משי בייקר</span>
       <span class="statusbar-end">
         <button id="btn-mute" class="btn btn-ghost btn-small" title="השתקה">🔊</button>
         <button id="btn-logout" class="btn btn-ghost btn-small">סיום משמרת</button>

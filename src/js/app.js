@@ -61,8 +61,13 @@ function sfx(name, loop = false) {
 }
 function stopSfx() { fx.pause(); fx.loop = false; }
 
+/** Narration text carries nikud for the voice; on screen it is shown without it. */
+const plain = (text) => (text || "").replace(/[\u0591-\u05C7]/g, "");
+const lineText = (id) => plain(LINES[id]);
+
 function showSubtitle(text) {
   const el = $("subtitle");
+  text = plain(text);
   if (!text) { el.hidden = true; return; }
   el.innerHTML = "";
   const span = document.createElement("span");
@@ -402,7 +407,7 @@ async function answerCall() {
   const s = game.scene;
   $("caller-icon").textContent = s.callerIcon;
   $("caller-name").textContent = s.callerName;
-  $("caller-text").textContent = LINES["call_" + s.id] || "";
+  $("caller-text").textContent = lineText("call_" + s.id);
   const pb = $("priority-badge");
   pb.className = `priority-badge priority-${s.priority}`;
   pb.textContent = PRIORITY_NAMES[s.priority];
@@ -631,7 +636,7 @@ async function finishIncident() {
   const s = game.scene;
   stopTimer();
   showStep("step-done");
-  $("done-text").textContent = LINES["done_" + s.id] || "";
+  $("done-text").textContent = lineText("done_" + s.id);
   log(`אירוע ${s.code} נסגר`, "ok");
   renderUnitStatus();
   sfx("radio");
@@ -672,7 +677,7 @@ async function commanderReview() {
   $("score-total").textContent = `${total} / ${max}`;
   const starsEl = $("commander-stars");
   starsEl.innerHTML = "";
-  $("commander-text").textContent = `${officerName()}, ${LINES[lineId("cmd_" + stars)] || ""}`;
+  $("commander-text").textContent = `${officerName()}, ${lineText(lineId("cmd_" + stars))}`;
   const ru = $("rankup");
   ru.hidden = after <= before;
   if (after > before) ru.textContent = `קידום בדרגה: ${rankName(RANKS[after])} ${officerName()}`;
@@ -792,8 +797,25 @@ async function init() {
     $("screen-login").hidden = false;
     buildLogin();
   });
-  // welcome line when the login screen is first shown (needs a user gesture in browsers; fine in Tauri)
-  document.body.addEventListener("pointerdown", () => { if (!$("screen-login").hidden && !voice.src) say("welcome"); }, { once: true });
+  // dedication splash: the first click speaks the dedication, then the login screen opens with the welcome
+  // line. A second click while it is speaking skips straight to the login screen.
+  let splash = "waiting";
+  const leaveSplash = () => {
+    if (splash === "done") return;
+    splash = "done";
+    $("screen-splash").hidden = true;
+    $("screen-login").hidden = false;
+    say("welcome");
+  };
+  $("screen-splash").addEventListener("click", async () => {
+    if (splash === "playing") { leaveSplash(); return; }
+    if (splash !== "waiting") return;
+    splash = "playing";
+    $("screen-splash").classList.add("playing");
+    sfx("star");
+    await say("dedication");
+    leaveSplash();
+  });
 }
 
 init();

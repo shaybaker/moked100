@@ -44,12 +44,16 @@ MAN = (AVRI, "+12%", "+2Hz")         # worried caller
 WOMAN = (HILA, "+12%", "+6Hz")       # worried caller
 GIRL = (HILA, "+10%", "+18Hz")       # child caller
 BOY = (AVRI, "+10%", "+16Hz")
+WARM = (HILA, "+2%", "+0Hz")         # the dedication on the opening screen
 
 PAUSE = 0.25        # longest silence kept inside a line, in seconds
 LEAD, TAIL = 0.05, 0.12   # silence kept at the start / end of a line
 
 # id: (preset, text) where preset and text may each be a {"m":..., "f":...} pair
 LINES = {
+    # --- dedication (opening screen). On screen it reads "נבנה באהבה גדולה לאיתי, משי בייקר"; the spoken line
+    # avoids the prefixed forms "לאיתי" / "משי", which the voice misreads as le-iti / meshi ---
+    "dedication": (WARM, "המשחק הזה נבנה באהבה גדולה בשביל אִיתַי, מאת שי בייקר."),
     # --- dispatcher / guidance ---
     "welcome": (DISPATCHER, {"m": "מוקד מאה, ערב טוב. השוטר התורן מתבקש להתייצב בעמדה ולהתחיל משמרת.",
                              "f": "מוקד מאה, ערב טוב. השוטרת התורנית מתבקשת להתייצב בעמדה ולהתחיל משמרת."}),
